@@ -1,14 +1,14 @@
 {
-  "name": "navigator-shell",
-  "version": "0.0.1",
+  "name": "project-navigator",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.52.1",
     "next": "14.2.5",
     "react": "18.3.1",
     "react-dom": "18.3.1"

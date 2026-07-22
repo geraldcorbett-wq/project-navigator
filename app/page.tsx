@@ -1,3 +1,6 @@
+import AuthPanel from "./auth-panel";
+import SystemStatus from "./system-status";
+
 export default function HomePage() {
   return (
     <main className="shell">
@@ -10,24 +13,23 @@ export default function HomePage() {
             <span />
             <span />
           </div>
-          <p className="brand">Navigator</p>
+          <p className="brand">Project Navigator</p>
         </div>
 
-        <div className="content">
-          <p className="eyebrow">AVAILABLE WHEN NEEDED</p>
-          <h1 id="navigator-title">HI.</h1>
-          <p className="intro">
-            I&apos;m here. Quietly ready to help you organize what matters,
-            one clear step at a time.
-          </p>
-          <button type="button" className="primaryButton">
-            Begin
-          </button>
+        <div className="content identityLayout">
+          <div className="greeting">
+            <p className="eyebrow">ALL SYSTEMS GO</p>
+            <h1 id="navigator-title">HI.</h1>
+            <p className="intro">
+              I&apos;m here. Quietly ready to help you organize what matters,
+              one clear step at a time.
+            </p>
+          </div>
+          <AuthPanel />
         </div>
 
         <footer>
-          <span className="statusDot" aria-hidden="true" />
-          <span>Shell online</span>
+          <SystemStatus />
         </footer>
       </section>
     </main>
