@@ -1,0 +1,6 @@
+PACKAGE 10.4
+
+- Deleting a Memory, Circle, Schedule item, or Conversation now removes every entity_links row connected to it.
+- Existing orphaned links are automatically removed when a Chain is loaded.
+- Chain panels refresh when the browser regains focus or becomes visible, preventing stale links from remaining on screen.
+- No SQL migration required.

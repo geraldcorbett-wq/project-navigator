@@ -1,0 +1,6 @@
+import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, isAuthFailure } from "../../../lib/api/auth";
+import { cleanOptionalText, jsonError, readJsonObject } from "../../../lib/api/json";
+export const dynamic="force-dynamic";
+export async function GET(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const {data,error}=await auth.supabase.from("missions").select("*, tasks(*)").eq("user_id",auth.user.id).order("updated_at",{ascending:false});if(error)return jsonError(error.message,500);return NextResponse.json({missions:data});}
+export async function POST(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const body=await readJsonObject(request);if(!body)return jsonError("A JSON object is required.",400);const title=cleanOptionalText(body.title,200);if(!title)return jsonError("title is required.",400);const {data,error}=await auth.supabase.from("missions").insert({user_id:auth.user.id,title,description:cleanOptionalText(body.description,8000)??null,due_at:body.due_at??null}).select("*").single();if(error)return jsonError(error.message,500);return NextResponse.json({mission:data},{status:201});}

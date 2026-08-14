@@ -1,0 +1,32 @@
+"use client";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import RelatedPanel from "../../components/related-panel";
+import { useLinkSelection } from "../../components/use-link-selection";
+
+type Item={id:string;title:string;notes:string|null;starts_at:string;ends_at:string|null;status:string;is_pinned:boolean};
+function defaultScheduleDateTime(){
+ const now=new Date();
+ const year=now.getFullYear();
+ const month=String(now.getMonth()+1).padStart(2,"0");
+ const day=String(now.getDate()).padStart(2,"0");
+ return `${year}-${month}-${day}T12:00:00`;
+}
+export default function SchedulePanel(){
+ const supabase=useMemo(()=>getSupabaseBrowserClient(),[]);const[items,setItems]=useState<Item[]>([]);const[title,setTitle]=useState("");const[startsAt,setStartsAt]=useState(defaultScheduleDateTime);const[notes,setNotes]=useState("");const[query,setQuery]=useState("");const[showPast,setShowPast]=useState(false);const[editingId,setEditingId]=useState<string|null>(null);const[message,setMessage]=useState("Loading schedule…");const[busy,setBusy]=useState(false);const{selectionMode,selectEntity,cancelSelection,selectionMessage}=useLinkSelection();
+ async function token(){return(await supabase.auth.getSession()).data.session?.access_token;}
+ async function load(){const accessToken=await token();if(!accessToken){setMessage("Sign in to use schedule.");return;}const params=new URLSearchParams();if(query.trim())params.set("q",query.trim());if(showPast||selectionMode){params.set("includePast","1");}else{const startOfToday=new Date();startOfToday.setHours(0,0,0,0);params.set("from",startOfToday.toISOString());}const response=await fetch(`/api/schedule?${params.toString()}`,{headers:{Authorization:`Bearer ${accessToken}`}});const body=await response.json();if(!response.ok){setMessage(body.error||"Could not load schedule.");return;}setItems(body.items||[]);setMessage(body.items?.length?"":"Nothing scheduled yet.");}
+ useEffect(()=>{void load();},[showPast,selectionMode]);
+ function reset(){setEditingId(null);setTitle("");setStartsAt(defaultScheduleDateTime());setNotes("");}
+ async function save(event:FormEvent){event.preventDefault();setBusy(true);const accessToken=await token();const payload={title,notes,starts_at:new Date(startsAt).toISOString(),time_zone:Intl.DateTimeFormat().resolvedOptions().timeZone};const response=await fetch(editingId?`/api/schedule/${editingId}`:"/api/schedule",{method:editingId?"PATCH":"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${accessToken}`},body:JSON.stringify(payload)});const body=await response.json();setBusy(false);if(!response.ok){setMessage(body.error||"Could not save item.");return;}reset();setMessage(editingId?"Schedule updated.":"Scheduled.");await load();}
+ async function patch(id:string,values:Record<string,unknown>){const accessToken=await token();const response=await fetch(`/api/schedule/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json",Authorization:`Bearer ${accessToken}`},body:JSON.stringify(values)});const body=await response.json();if(!response.ok){setMessage(body.error||"Could not update item.");return;}await load();}
+ async function remove(id:string){const accessToken=await token();const response=await fetch(`/api/schedule/${id}`,{method:"DELETE",headers:{Authorization:`Bearer ${accessToken}`}});if(!response.ok){const body=await response.json();setMessage(body.error||"Could not delete item.");return;}await load();}
+ function edit(item:Item){setEditingId(item.id);setTitle(item.title);setStartsAt(new Date(new Date(item.starts_at).getTime()-new Date(item.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16));setNotes(item.notes||"");window.scrollTo({top:0,behavior:"smooth"});}
+ return <div className="featureStack">
+  {selectionMode&&<div className="selectionBanner"><strong>Select an event to link</strong><button type="button" className="quietButton" onClick={cancelSelection}>Cancel</button></div>}
+  {!selectionMode&&<form className="featureForm" onSubmit={save}><label>What<input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200} required/></label><label>When<span className="dateInputWrap"><input type="datetime-local" value={startsAt} onChange={e=>setStartsAt(e.target.value)} required/></span></label><label>Notes<textarea value={notes} onChange={e=>setNotes(e.target.value)} maxLength={4000} rows={3}/></label><div className="inlineActions"><button className="primaryButton" disabled={busy}>{busy?"Saving…":editingId?"Update schedule":"Add to schedule"}</button>{editingId&&<button className="quietButton" type="button" onClick={reset}>Cancel</button>}</div></form>}
+  <div className="scheduleTools"><form className="memorySearch" onSubmit={event=>{event.preventDefault();void load();}}><label>Search schedule<input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Search title or notes"/></label><button className="quietButton">Search</button>{query&&<button className="textLink" type="button" onClick={()=>{setQuery("");setTimeout(()=>void load(),0);}}>Clear</button>}</form>{!selectionMode&&<label className="showPast"><input type="checkbox" checked={showPast} onChange={event=>setShowPast(event.target.checked)}/> Show past</label>}</div>
+  {(selectionMessage||message)&&<p className="authMessage" aria-live="polite">{selectionMessage||message}</p>}
+  <div className="itemList">{items.map(item=>selectionMode?<button type="button" className={`itemCard selectionCard ${item.is_pinned?"pinnedCard":""}`} key={item.id} onClick={()=>void selectEntity("schedule",item.id)}><div><h2>{item.title}</h2><p>{new Date(item.starts_at).toLocaleString()}</p>{item.notes&&<small>{item.notes}</small>}</div></button>:<article className={`itemCard scheduleCard ${item.is_pinned?"pinnedCard":""}`} key={item.id}><div>{item.is_pinned&&<span className="pinnedBadge">Pinned</span>}<h2>{item.title}</h2><p>{new Date(item.starts_at).toLocaleString()}</p>{item.notes&&<small>{item.notes}</small>}</div><div className="cardActions"><button className="textLink" type="button" onClick={()=>void patch(item.id,{is_pinned:!item.is_pinned})}>{item.is_pinned?"unpin":"pin"}</button><button className="textLink" type="button" onClick={()=>edit(item)}>edit</button><button className="dangerLink" type="button" onClick={()=>void remove(item.id)}>delete</button></div><RelatedPanel entityType="schedule" entityId={item.id}/></article>)}</div>
+ </div>;
+}

@@ -1,0 +1,4 @@
+import { NextRequest,NextResponse } from "next/server";
+import { authenticateRequest,isAuthFailure } from "../../../../../lib/api/auth";
+import { cleanOptionalText,jsonError,readJsonObject } from "../../../../../lib/api/json";
+export async function POST(request:NextRequest,{params}:{params:{missionId:string}}){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const body=await readJsonObject(request);if(!body)return jsonError("A JSON object is required.",400);const title=cleanOptionalText(body.title,240);if(!title)return jsonError("title is required.",400);const {data,error}=await auth.supabase.from("tasks").insert({mission_id:params.missionId,user_id:auth.user.id,title,position:Number(body.position)||0,due_at:body.due_at??null}).select("*").single();if(error)return jsonError(error.message,500);return NextResponse.json({task:data},{status:201});}

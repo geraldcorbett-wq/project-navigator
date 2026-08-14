@@ -1,0 +1,14 @@
+PROJECT NAVIGATOR - PACKAGE 4: MEMORY ENGINE
+
+Adds:
+- Create, edit, delete, search, pin and unpin memories
+- Attach memories to conversations
+- Automatic title-based relevant-memory retrieval when conversations open
+- Memory destination on the Hi screen
+
+Before run:
+1. Keep your existing .env.local
+2. Run supabase/migrations/014_memory_engine.sql once in Supabase SQL Editor
+3. npm install
+4. npm run build
+5. npm run dev

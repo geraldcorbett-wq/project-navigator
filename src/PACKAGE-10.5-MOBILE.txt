@@ -1,0 +1,19 @@
+Project Navigator Package 10.5 Mobile POC
+
+Goal: one Navigator codebase, native iOS and Android doors.
+
+Changes from 10.4:
+- Added Capacitor 8.4.2 dependencies and configuration.
+- Added native mobile scripts.
+- Added safe-area / phone viewport handling.
+- Added touch-friendly minimum control heights on mobile.
+- Added mobile shell fallback.
+- Added mobile POC build instructions.
+
+No database migration changes.
+
+Important:
+- The existing Next.js API routes remain the backend.
+- For phone testing, CAPACITOR_SERVER_URL must point to a Navigator URL reachable by the phone.
+- Android can be built from Windows.
+- iOS uses the same codebase but Apple requires macOS/Xcode for compilation/signing.

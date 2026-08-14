@@ -1,0 +1,8 @@
+Project Navigator Package 10.3
+
+Fixes schedule list visibility after adding an entry:
+- The default Schedule view now includes all entries from the start of the user's local day.
+- A new entry created with the 12:00:00 default remains visible even when added after noon.
+- Show past continues to display the full schedule history.
+
+No new SQL required.

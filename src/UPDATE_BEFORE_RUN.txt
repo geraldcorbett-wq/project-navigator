@@ -1,0 +1,6 @@
+1. Copy this package over PROD.
+2. Keep the existing .env.local.
+3. In Supabase SQL Editor, run: supabase/migrations/015_memory_circles_repair.sql
+4. npm install
+5. npm run build
+6. npm run dev

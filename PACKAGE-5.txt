@@ -1,0 +1,5 @@
+PACKAGE 5
+- Circles create/load/delete verified in code path.
+- Memory create/load/edit/delete/search/pin/attach included.
+- Importance order: 5 Critical, 4 High, 3 Medium, 2 Low, 1 None.
+- Run supabase/migrations/015_memory_circles_repair.sql once before testing.

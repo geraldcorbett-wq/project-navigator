@@ -1,0 +1,8 @@
+Project Navigator Package 10.2
+
+Changes from 10.1:
+- Fixes Link To dropdown option contrast (dark text on white options).
+- New Schedule items default to today at 12:00:00 local time.
+- Resetting the Schedule form restores the 12:00:00 default.
+
+No new SQL migration is required.

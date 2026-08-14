@@ -1,0 +1,16 @@
+Project Navigator Backend Package 7
+
+Adds:
+- Adaptive Hi dashboard for desktop and phone
+- Gray dashboard background and lighter cards
+- Green pinned-state treatment
+- Importance colors kept separate and visible
+- Schedule search, edit, delete, pin, past-event toggle
+- Maximum 3 pinned schedule items
+
+Before run:
+1. Copy this package over PROD. Keep .env.local.
+2. Run supabase/migrations/017_schedule_dashboard.sql once in Supabase SQL Editor.
+3. npm install
+4. npm run build
+5. npm run dev

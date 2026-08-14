@@ -1,0 +1,6 @@
+import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, isAuthFailure } from "../../../lib/api/auth";
+import { cleanOptionalText, jsonError, readJsonObject } from "../../../lib/api/json";
+export const dynamic="force-dynamic";
+export async function GET(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const {data,error}=await auth.supabase.from("background_jobs").select("*").eq("user_id",auth.user.id).order("created_at",{ascending:false}).limit(100);if(error)return jsonError(error.message,500);return NextResponse.json({jobs:data});}
+export async function POST(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const body=await readJsonObject(request);if(!body)return jsonError("A JSON object is required.",400);const job_type=cleanOptionalText(body.job_type,120);if(!job_type)return jsonError("job_type is required.",400);const {data,error}=await auth.supabase.from("background_jobs").insert({user_id:auth.user.id,job_type,payload:body.payload??{},run_after:body.run_after??new Date().toISOString()}).select("*").single();if(error)return jsonError(error.message,500);return NextResponse.json({job:data},{status:202});}

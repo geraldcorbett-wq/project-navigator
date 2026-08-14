@@ -1,0 +1,15 @@
+PROJECT NAVIGATOR — PACKAGE 3
+
+Conversation engine:
+- Create conversations
+- Open conversations
+- Rename conversations
+- Delete conversations
+- Send and persist messages
+- Refresh and reload message history
+
+No new SQL migration is required.
+Copy this package over the current PROD project, keep .env.local, then run:
+  npm install
+  npm run build
+  npm run dev

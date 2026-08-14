@@ -1,0 +1,15 @@
+Project Navigator Backend Package 9
+
+Universal Relationships
+- Link memories, circles, schedule items, and conversations to each other.
+- Automatic backlinks.
+- Search everything from the relationship picker.
+- Unlink without deleting either item.
+- Related panels on memories, circles, schedule items, and conversation detail pages.
+
+Before run:
+1. Copy this package over PROD and keep .env.local.
+2. Run supabase/migrations/018_universal_relationships.sql in Supabase SQL Editor.
+3. npm install
+4. npm run build
+5. npm run dev

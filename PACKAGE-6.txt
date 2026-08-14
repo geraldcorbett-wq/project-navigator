@@ -1,0 +1,5 @@
+Package 6
+- Memory pins default to 3; user can increase to 4 or 5.
+- One pinned circle maximum.
+- Circle search matches name and description.
+- Run supabase/migrations/016_pin_limits_circle_search.sql once.

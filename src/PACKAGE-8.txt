@@ -1,0 +1,9 @@
+PROJECT NAVIGATOR BACKEND PACKAGE 8
+
+Changes:
+- Adds visible Schedule search controls with Search and Clear.
+- Applies the gray background and green interaction/pin color scheme across Hi, Memory, Circles, and Schedule.
+- Keeps importance colors separate and clearly visible.
+
+No SQL migration required.
+Copy over PROD, keep .env.local, then npm install, npm run build, npm run dev.

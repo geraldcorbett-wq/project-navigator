@@ -1,0 +1,18 @@
+Project Navigator Backend Package 1: Shared Foundation
+
+Includes:
+- Supabase/auth connection
+- profiles
+- conversations/messages
+- events/audit trail
+- orientation
+- RLS and database triggers
+- standard API auth/JSON helpers
+- one SQL installer: supabase/package-1-shared-foundation.sql
+
+Run:
+1. Copy project files into PROD.
+2. Run supabase/package-1-shared-foundation.sql in Supabase SQL Editor.
+3. npm install
+4. npm run build
+5. npm run dev

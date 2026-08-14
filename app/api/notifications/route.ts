@@ -1,0 +1,6 @@
+import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, isAuthFailure } from "../../../lib/api/auth";
+import { jsonError, readJsonObject } from "../../../lib/api/json";
+export const dynamic="force-dynamic";
+export async function GET(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);let query=auth.supabase.from("notifications").select("*").eq("user_id",auth.user.id).order("created_at",{ascending:false}).limit(100);if(request.nextUrl.searchParams.get("unread")==="true")query=query.is("read_at",null);const {data,error}=await query;if(error)return jsonError(error.message,500);return NextResponse.json({notifications:data});}
+export async function PATCH(request:NextRequest){const auth=await authenticateRequest(request);if(isAuthFailure(auth))return jsonError(auth.error,auth.status);const body=await readJsonObject(request);if(!body||typeof body.id!=="string")return jsonError("id is required.",400);const {data,error}=await auth.supabase.from("notifications").update({read_at:body.read===false?null:new Date().toISOString()}).eq("id",body.id).eq("user_id",auth.user.id).select("*").single();if(error)return jsonError(error.message,500);return NextResponse.json({notification:data});}

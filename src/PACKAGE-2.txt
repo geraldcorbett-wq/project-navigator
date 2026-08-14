@@ -1,0 +1,10 @@
+Project Navigator Backend Package 2
+
+Adds working Circles and Schedule storage, APIs, RLS, and pages.
+
+Before run:
+1. Run supabase/migrations/013_circles_schedule.sql in Supabase SQL Editor.
+2. Keep the existing .env.local.
+3. npm install
+4. npm run build
+5. npm run dev

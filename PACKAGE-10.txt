@@ -1,0 +1,18 @@
+PROJECT NAVIGATOR - PACKAGE 10
+
+Changes:
+- Persistent Home / Memories / Circles / Schedule / Conversations navigation on every primary page.
+- Home continues to open the friendly Hi dashboard.
+- "Add Link" and global relationship search replaced by "Link To" destination dropdown.
+- Destination pages open in selection mode.
+- Selecting an item creates the link immediately and returns to the originating page.
+- "Related" renamed to "Chain".
+- Unified content width, spacing, card alignment, controls, and responsive layout.
+
+Database:
+- No new migration. Package 10 requires migration 018_universal_relationships.sql to have been run.
+
+Run:
+npm install
+npm run build
+npm run dev

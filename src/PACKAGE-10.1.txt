@@ -1,0 +1,5 @@
+Project Navigator Package 10.1
+
+- Removes duplicate global navigation from the Hi screen.
+- Moves global navigation to the bottom of Memories, Circles, Schedule, Conversations, and conversation detail pages.
+- No SQL changes.
