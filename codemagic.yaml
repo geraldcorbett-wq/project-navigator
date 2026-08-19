@@ -27,9 +27,7 @@ workflows:
 
       - name: Build Navigator
         script: npm run build
-      - name: Build Navigator
-        script: npm run build
-
+        
       - name: Sync Capacitor iOS
         script: npx cap sync ios
 
