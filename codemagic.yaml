@@ -7,7 +7,7 @@ workflows:
     environment:
       vars:
         NEXT_PUBLIC_SUPABASE_URL: "https://lzpfyvmafrzzpcalrrua.supabase.co"
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz"
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz"
       node: 22
       xcode: latest
       cocoapods: default
