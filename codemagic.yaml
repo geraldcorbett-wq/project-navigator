@@ -5,6 +5,9 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
+      vars:
+        NEXT_PUBLIC_SUPABASE_URL: "https://lzpfyvmafrzzpcalrrua.supabase.co"
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz"
       node: 22
       xcode: latest
       cocoapods: default
