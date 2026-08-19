@@ -12,10 +12,21 @@ workflows:
       xcode: latest
       cocoapods: default
 
-    scripts:
+        scripts:
       - name: Install dependencies
         script: npm ci
 
+      - name: Verify Supabase environment
+        script: |
+          echo "URL=https://lzpfyvmafrzzpcalrrua.supabase.co"
+          if [ -n "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz" ]; then
+            echo "KEY=present"
+          else
+            echo "KEY=missing"
+          fi
+
+      - name: Build Navigator
+        script: npm run build
       - name: Build Navigator
         script: npm run build
 
