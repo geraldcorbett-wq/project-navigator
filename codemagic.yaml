@@ -31,6 +31,10 @@ workflows:
             echo "KEY=missing"
           fi
 
+      - name: Increment iOS build number
+        script: |
+          agvtool new-version -all $BUILD_NUMBER
+
       - name: Build Navigator
         script: npm run build
         
