@@ -15,11 +15,6 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.projectnavigator.app
 
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-
     scripts:
       - name: Install dependencies
         script: npm ci
@@ -50,6 +45,13 @@ workflows:
             --project ios/App/App.xcodeproj \
             --scheme App \
             --export-options-plist=/Users/builder/export_options.plist
+
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
 
     artifacts:
       - build/ios/ipa/*.ipa
