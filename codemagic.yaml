@@ -11,6 +11,9 @@ workflows:
       node: 22
       xcode: latest
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.projectnavigator.app
 
     scripts:
       - name: Install dependencies
@@ -32,14 +35,11 @@ workflows:
         script: npx cap sync ios
 
       
-      - name: Build unsigned iOS app
+      - name: Build signed iOS IPA
         script: |
-          xcodebuild \
-            -project ios/App/App.xcodeproj \
-            -scheme App \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -derivedDataPath build
+          xcode-project build-ipa \
+            --project ios/App/App.xcodeproj \
+            --scheme App
 
     artifacts:
-      - build/Build/Products/Debug-iphonesimulator/App.app
+      - build/ios/ipa/*.ipa
