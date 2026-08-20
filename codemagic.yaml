@@ -17,8 +17,8 @@ workflows:
 
     publishing:
       app_store_connect:
-      auth: integration
-      submit_to_testflight: true
+        auth: integration
+        submit_to_testflight: true
 
     scripts:
       - name: Install dependencies
