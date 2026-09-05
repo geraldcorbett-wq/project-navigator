@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "project-navigator",
   "version": "2.0.0",
   "private": true,
@@ -17,18 +17,12 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.52.1",
-<<<<<<< HEAD
-    "next": "^14.2.35",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-=======
     "next": "15.5.24",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "@capacitor/core": "^8.5.0",
     "@capacitor/android": "^8.5.0",
     "@capacitor/ios": "^8.5.0"
->>>>>>> 47c309a (Navigator 2.0 contained AI release)
   },
   "devDependencies": {
     "@types/node": "20.14.12",
