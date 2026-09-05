@@ -1,7 +1,5 @@
 node_modules
 .next
-out
-.env
+.git
+*.zip
 .env.local
-*.log
-.DS_Store

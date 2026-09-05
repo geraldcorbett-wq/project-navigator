@@ -806,3 +806,47 @@ button:disabled {
   .cardActions { justify-content: flex-start; }
   .relatedPanel { grid-column: 1; }
 }
+
+/* Package 10.5 Mobile POC: one Navigator, native iOS + Android doors */
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+}
+
+.shell {
+  min-height: 100dvh;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-right: max(12px, env(safe-area-inset-right));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+}
+
+@media (max-width: 720px) {
+  .panel,
+  .compactPanel,
+  .conversationPanelShell {
+    width: 100%;
+    min-height: calc(100dvh - max(24px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    border-radius: 20px;
+  }
+
+  .globalNav {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 30;
+    background: rgba(43,47,53,.96);
+    backdrop-filter: blur(14px);
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    min-height: 44px;
+  }
+}

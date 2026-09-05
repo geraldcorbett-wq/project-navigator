@@ -4,7 +4,8 @@ import { deleteEntityLinks } from "../../../../lib/api/entity-links";
 import { cleanOptionalText, jsonError, readJsonObject } from "../../../../lib/api/json";
 export const dynamic = "force-dynamic";
 
-export async function PATCH(request: NextRequest, { params }: { params: { circleId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ circleId: string }> }) {
+  const { circleId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   const body = await readJsonObject(request);
@@ -19,14 +20,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { circle
   if ("is_pinned" in body) {
     const wantsPin = Boolean(body.is_pinned);
     if (wantsPin) {
-      await auth.supabase.from("circles").update({ is_pinned: false }).eq("user_id", auth.user.id).neq("id", params.circleId);
+      await auth.supabase.from("circles").update({ is_pinned: false }).eq("user_id", auth.user.id).neq("id", circleId);
     }
     update.is_pinned = wantsPin;
   }
   const { data, error } = await auth.supabase
     .from("circles")
     .update(update)
-    .eq("id", params.circleId)
+    .eq("id", circleId)
     .eq("user_id", auth.user.id)
     .select("*")
     .single();
@@ -34,15 +35,16 @@ export async function PATCH(request: NextRequest, { params }: { params: { circle
   return NextResponse.json({ circle: data });
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { circleId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ circleId: string }> }) {
+  const { circleId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   try {
-    await deleteEntityLinks(auth.supabase, auth.user.id, "circle", params.circleId);
+    await deleteEntityLinks(auth.supabase, auth.user.id, "circle", circleId);
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Could not remove connections.", 500);
   }
-  const { error } = await auth.supabase.from("circles").delete().eq("id", params.circleId).eq("user_id", auth.user.id);
+  const { error } = await auth.supabase.from("circles").delete().eq("id", circleId).eq("user_id", auth.user.id);
   if (error) return jsonError(error.message, 500);
   return NextResponse.json({ ok: true });
 }

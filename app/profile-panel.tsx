@@ -41,7 +41,7 @@ export default function ProfilePanel() {
     const { data, error } = await supabase.from("profiles").select("id, preferred_name, display_name, preferred_language, time_zone, navigator_name").eq("id", current.user.id).maybeSingle<Profile>();
     if (error) {
       const missingProfiles = error.message.toLowerCase().includes("public.profiles") || error.message.toLowerCase().includes("schema cache");
-      setMessage(missingProfiles ? "Database setup is incomplete. Run supabase/project-navigator-setup.sql in the Supabase SQL Editor." : error.message);
+      setMessage(missingProfiles ? "Navigator setup is incomplete." : "Navigator could not load your profile.");
       setBusy(false);
       return;
     }

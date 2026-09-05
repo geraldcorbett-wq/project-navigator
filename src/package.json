@@ -11,7 +11,8 @@
     "mobile:android": "cap run android",
     "mobile:ios": "cap run ios",
     "mobile:open:android": "cap open android",
-    "mobile:open:ios": "cap open ios"
+    "mobile:open:ios": "cap open ios",
+    "verify:package": "node scripts/verify-package.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.52.1",
@@ -28,5 +29,8 @@
     "@types/react-dom": "18.3.0",
     "typescript": "5.5.4",
     "@capacitor/cli": "8.4.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

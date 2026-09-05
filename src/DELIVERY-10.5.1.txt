@@ -1,0 +1,12 @@
+Project Navigator 10.5.1 Stabilized Delivery
+
+Base: project-navigator-package-10.5-mobile-poc.zip
+
+Corrections:
+1. Removed stale package-lock.json from the 1.0.10 dependency set. It omitted Capacitor 8 packages declared in 10.5.
+2. Declared Node.js >=22, required by Capacitor 8.
+3. Added CAPACITOR_SERVER_URL to .env.example.
+4. Updated README to the actual 10.5 package and installation sequence.
+5. Added dependency-free `npm run verify:package` validation.
+
+Application feature code and Supabase migrations were not rolled back or replaced.

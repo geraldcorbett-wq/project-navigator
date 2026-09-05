@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function readJsonObject(
-  request: NextRequest
-): Promise<Record<string, unknown> | null> {
+export async function readJsonObject(request: NextRequest): Promise<Record<string, unknown> | null> {
   try {
     const body: unknown = await request.json();
     if (!body || typeof body !== "object" || Array.isArray(body)) return null;
@@ -13,13 +11,11 @@ export async function readJsonObject(
 }
 
 export function jsonError(error: string, status: number) {
-  return NextResponse.json({ error }, { status });
+  const safeError = status >= 500 ? "Navigator could not complete that request." : error;
+  return NextResponse.json({ error: safeError }, { status, headers: { "Cache-Control": "no-store" } });
 }
 
-export function cleanOptionalText(
-  value: unknown,
-  maxLength: number
-): string | null | undefined {
+export function cleanOptionalText(value: unknown, maxLength: number): string | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (typeof value !== "string") return undefined;

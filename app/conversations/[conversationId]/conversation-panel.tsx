@@ -96,24 +96,46 @@ export default function ConversationPanel({ conversationId }: { conversationId: 
       return;
     }
 
-    const response = await fetch(`/api/conversations/${conversationId}/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ role: "user", content: clean })
-    });
-    const body = await response.json();
+    setDraft("");
+    setStatus("Navigator is thinking…");
+
+    let response: Response;
+    let body: any;
+    try {
+      response = await fetch(`/api/conversations/${conversationId}/respond`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ content: clean }),
+        signal: AbortSignal.timeout(65000)
+      });
+      body = await response.json();
+    } catch (error) {
+      setBusy(false);
+      setDraft(clean);
+      setStatus(error instanceof Error ? `Navigator request failed: ${error.message}` : "Navigator request failed.");
+      return;
+    }
     setBusy(false);
+
+    if (body.user_message) {
+      setMessages((current) => current.some((item) => item.id === body.user_message.id) ? current : [...current, body.user_message]);
+    }
     if (!response.ok) {
-      setStatus(body.error || "Could not send message.");
+      setStatus(body.error || "Navigator could not answer.");
+      if (!body.user_message) setDraft(clean);
       return;
     }
 
-    setDraft("");
-    setMessages((current) => [...current, body.message]);
-    setStatus("Saved.");
+    setMessages((current) => {
+      const next = [...current];
+      if (body.user_message && !next.some((item) => item.id === body.user_message.id)) next.push(body.user_message);
+      if (body.assistant_message && !next.some((item) => item.id === body.assistant_message.id)) next.push(body.assistant_message);
+      return next;
+    });
+    setStatus("");
   }
 
   async function saveTitle() {

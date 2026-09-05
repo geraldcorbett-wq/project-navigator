@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   let query = auth.supabase
     .from("circles")
     .select("*, circle_members(*)")
-    .eq("user_id", auth.user.id)
+    
     .order("is_pinned", { ascending: false })
     .order("updated_at", { ascending: false });
   if (q) {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
   const { data, error } = await query;
   if (error) return jsonError(error.message, 500);
-  return NextResponse.json({ circles: data ?? [] });
+  return NextResponse.json({ circles: (data ?? []).map((circle:any) => ({ ...circle, access: circle.user_id === auth.user.id ? "owner" : "respond" })) });
 }
 
 export async function POST(request: NextRequest) {

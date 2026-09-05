@@ -3,7 +3,8 @@ import { authenticateRequest, isAuthFailure } from "../../../../lib/api/auth";
 import { deleteEntityLinks } from "../../../../lib/api/entity-links";
 import { cleanOptionalText, jsonError, readJsonObject } from "../../../../lib/api/json";
 
-export async function PATCH(request: NextRequest, { params }: { params: { memoryId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ memoryId: string }> }) {
+  const { memoryId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   const body = await readJsonObject(request);
@@ -30,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { memory
         .select("id", { count: "exact", head: true })
         .eq("user_id", auth.user.id)
         .eq("is_pinned", true)
-        .neq("id", params.memoryId);
+        .neq("id", memoryId);
       if (countError) return jsonError(countError.message, 500);
       if ((count || 0) >= limit) return jsonError(`You can pin up to ${limit} memories. Unpin one first.`, 409);
     }
@@ -40,7 +41,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { memory
   const { data, error } = await auth.supabase
     .from("memories")
     .update(patch)
-    .eq("id", params.memoryId)
+    .eq("id", memoryId)
     .eq("user_id", auth.user.id)
     .select("*")
     .single();
@@ -48,15 +49,16 @@ export async function PATCH(request: NextRequest, { params }: { params: { memory
   return NextResponse.json({ memory: data });
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { memoryId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ memoryId: string }> }) {
+  const { memoryId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   try {
-    await deleteEntityLinks(auth.supabase, auth.user.id, "memory", params.memoryId);
+    await deleteEntityLinks(auth.supabase, auth.user.id, "memory", memoryId);
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Could not remove connections.", 500);
   }
-  const { error } = await auth.supabase.from("memories").delete().eq("id", params.memoryId).eq("user_id", auth.user.id);
+  const { error } = await auth.supabase.from("memories").delete().eq("id", memoryId).eq("user_id", auth.user.id);
   if (error) return jsonError(error.message, 500);
   return new NextResponse(null, { status: 204 });
 }
