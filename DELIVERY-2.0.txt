@@ -1,0 +1,14 @@
+NAVIGATOR 2.0 CONTAINED RELEASE
+
+One application tree.
+Supported Next.js 15.5.24 line.
+Server-side contained AI with no web/tools/arbitrary external access.
+Human-only client message creation.
+Shared Circle view/respond boundary.
+Server-only usage and interaction accounting.
+Burst/concurrency containment without monthly per-user throttling.
+Aggregate usage data retained for operating-cost pricing analysis.
+Minimal public health response.
+Security headers and anti-framing enabled.
+Mobile bound to one approved HTTPS Navigator deployment.
+No live environment configuration distributed.

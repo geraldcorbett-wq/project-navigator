@@ -5,16 +5,17 @@ import { cleanOptionalText, jsonError, readJsonObject } from "../../../../lib/ap
 
 export const dynamic = "force-dynamic";
 
-type Context = { params: { conversationId: string } };
+type Context = { params: Promise<{ conversationId: string }> };
 
 export async function GET(request: NextRequest, { params }: Context) {
+  const { conversationId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
 
   const { data, error } = await auth.supabase
     .from("conversations")
     .select("id, title, summary, status, created_at, updated_at, last_message_at")
-    .eq("id", params.conversationId)
+    .eq("id", conversationId)
     .eq("user_id", auth.user.id)
     .maybeSingle();
 
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest, { params }: Context) {
 }
 
 export async function PATCH(request: NextRequest, { params }: Context) {
+  const { conversationId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
 
@@ -51,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
   const { data, error } = await auth.supabase
     .from("conversations")
     .update(updates)
-    .eq("id", params.conversationId)
+    .eq("id", conversationId)
     .eq("user_id", auth.user.id)
     .select("id, title, summary, status, created_at, updated_at, last_message_at")
     .maybeSingle();
@@ -62,11 +64,12 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 }
 
 export async function DELETE(request: NextRequest, { params }: Context) {
+  const { conversationId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
 
   try {
-    await deleteEntityLinks(auth.supabase, auth.user.id, "conversation", params.conversationId);
+    await deleteEntityLinks(auth.supabase, auth.user.id, "conversation", conversationId);
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Could not remove connections.", 500);
   }
@@ -74,7 +77,7 @@ export async function DELETE(request: NextRequest, { params }: Context) {
   const { data, error } = await auth.supabase
     .from("conversations")
     .delete()
-    .eq("id", params.conversationId)
+    .eq("id", conversationId)
     .eq("user_id", auth.user.id)
     .select("id")
     .maybeSingle();

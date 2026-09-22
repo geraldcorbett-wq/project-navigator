@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest, isAuthFailure } from "../../../../lib/api/auth";
 import { cleanOptionalText, jsonError, readJsonObject } from "../../../../lib/api/json";
 
-type Context = { params: { taskId: string } };
+type Context = { params: Promise<{ taskId: string }> };
 
 export async function PATCH(request: NextRequest, { params }: Context) {
+  const { taskId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   const body = await readJsonObject(request);
@@ -28,7 +29,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
   const { data, error } = await auth.supabase
     .from("tasks").update(patch)
-    .eq("id", params.taskId).eq("user_id", auth.user.id)
+    .eq("id", taskId).eq("user_id", auth.user.id)
     .select("*").maybeSingle();
   if (error) return jsonError(error.message, 500);
   if (!data) return jsonError("Task not found.", 404);
@@ -36,11 +37,12 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 }
 
 export async function DELETE(request: NextRequest, { params }: Context) {
+  const { taskId } = await params;
   const auth = await authenticateRequest(request);
   if (isAuthFailure(auth)) return jsonError(auth.error, auth.status);
   const { data, error } = await auth.supabase
     .from("tasks").delete()
-    .eq("id", params.taskId).eq("user_id", auth.user.id)
+    .eq("id", taskId).eq("user_id", auth.user.id)
     .select("id").maybeSingle();
   if (error) return jsonError(error.message, 500);
   if (!data) return jsonError("Task not found.", 404);

@@ -1,9 +1,10 @@
 import GlobalNav from "../../../components/global-nav";
 import ConversationPanel from "./conversation-panel";
 
-type Props = { params: { conversationId: string } };
+type Props = { params: Promise<{ conversationId: string }> };
 
-export default function ConversationPage({ params }: Props) {
+export default async function ConversationPage({ params }: Props) {
+  const { conversationId } = await params;
   return (
     <main className="shell appShell">
       <section className="panel conversationPanelShell">
@@ -11,7 +12,7 @@ export default function ConversationPage({ params }: Props) {
           <div className="mark" aria-hidden="true"><span /><span /></div>
           <p className="brand">Project Navigator</p>
         </div>
-        <ConversationPanel conversationId={params.conversationId} />
+        <ConversationPanel conversationId={conversationId} />
         <GlobalNav />
       </section>
     </main>

@@ -1,21 +1,37 @@
-# Project Navigator v1.0.1
+# Navigator 2.1 Local AI
 
-Backend-complete baseline for Project Navigator.
+Navigator 2.1 moves conversation intelligence onto the iPhone. The active AI path uses Apple's on-device Foundation Models framework through a native Capacitor plugin. There is no OpenAI API key and no cloud-model fallback.
 
-## Database
-Run `supabase/project-navigator-setup.sql` once in the Supabase SQL Editor. It contains every migration in order and is safe to rerun.
+## Runtime
 
-## Local
-```powershell
-npm install
-npm run build
-npm run dev
+- Navigator web/data services continue to provide authenticated Navigator data and persistence.
+- The iPhone requests a bounded Navigator-only context packet.
+- The iPhone's on-device language model generates the response.
+- Navigator saves that local response back into the authenticated conversation.
+- If the local model is unavailable, Navigator reports that state rather than using an external model.
+
+## Device requirement
+
+The local model requires a supported Apple Intelligence device running iOS 26 or later with Apple Intelligence enabled and the model ready on-device.
+
+## Protected deployment values
+
+The server build requires only the existing Navigator data configuration:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
-Keep `.env.local` with:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` for account deletion
+No AI API credential is required.
 
-## Package 10.4
-Deleting an entity now removes its connections. Existing orphan links are cleaned when a Chain loads. No new SQL is required.
+## Validation
+
+```bash
+npm install --no-audit --no-fund
+npm run verify:package
+npm run validate:release
+npm run typecheck
+npm run build
+```

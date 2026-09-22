@@ -1,16 +1,15 @@
 workflows:
   navigator-ios:
-    name: Navigator iOS POC
+    name: Navigator 2.0 iOS
     max_build_duration: 60
     instance_type: mac_mini_m2
 
     integrations:
-        app_store_connect: Navigator App Store
+      app_store_connect: Navigator App Store
 
     environment:
-      vars:
-        NEXT_PUBLIC_SUPABASE_URL: "https://lzpfyvmafrzzpcalrrua.supabase.co"
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz"
+      # Configure deployment values in the protected Codemagic environment.
+      # No live service configuration is stored in this source package.
       node: 22
       xcode: latest
       cocoapods: default
@@ -20,33 +19,34 @@ workflows:
 
     scripts:
       - name: Install dependencies
-        script: npm ci
+        script: npm install --no-audit --no-fund
 
-      - name: Verify Supabase environment
+      - name: Validate protected deployment configuration
         script: |
-          echo "URL=https://lzpfyvmafrzzpcalrrua.supabase.co"
-          if [ -n "sb_publishable_x4jYYvwe21_7E5WEiR-M7g_HWE-iySz" ]; then
-            echo "KEY=present"
-          else
-            echo "KEY=missing"
-          fi
+          test -n "$NEXT_PUBLIC_SUPABASE_URL" || { echo "Navigator deployment configuration missing."; exit 1; }
+          test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "Navigator deployment configuration missing."; exit 1; }
+
+      - name: Validate Navigator 2.0 release
+        script: npm run validate:release
+
+      - name: Typecheck Navigator
+        script: npm run typecheck
+
+      - name: Build Navigator server application
+        script: npm run build
 
       - name: Increment iOS build number
         script: |
           cd ios/App
           agvtool new-version -all $BUILD_NUMBER
 
-      - name: Build Navigator
-        script: npm run build
-        
       - name: Sync Capacitor iOS
         script: npx cap sync ios
 
       - name: Set up code signing
         script: |
-          xcode-project use-profiles \
-            --archive-method app-store
-      
+          xcode-project use-profiles --archive-method app-store
+
       - name: Build signed iOS IPA
         script: |
           xcode-project build-ipa \
@@ -54,12 +54,10 @@ workflows:
             --scheme App \
             --export-options-plist=/Users/builder/export_options.plist
 
-
     publishing:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-
 
     artifacts:
       - build/ios/ipa/*.ipa

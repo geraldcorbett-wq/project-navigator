@@ -20,7 +20,7 @@ export async function authenticateRequest(
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
 
   if (!url || !publishableKey) {
-    return { status: 503, error: "Supabase is not configured." };
+    return { status: 503, error: "Navigator is not ready." };
   }
 
   if (!token) {

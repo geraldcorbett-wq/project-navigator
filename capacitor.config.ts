@@ -2,11 +2,13 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.projectnavigator.app',
-  appName: 'Circles Navigator',
+  appName: 'Navigator',
   webDir: 'mobile-web',
   server: {
     url: 'https://navigator-1-production.up.railway.app',
-    cleartext: false
+    cleartext: false,
+    allowNavigation: ['navigator-1-production.up.railway.app'],
+    androidScheme: 'https'
   }
 };
 

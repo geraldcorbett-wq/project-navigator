@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { registerPlugin } from "@capacitor/core";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/client";
 import RelatedPanel from "../../../components/related-panel";
 
@@ -20,6 +21,13 @@ type Message = {
   content: string;
   created_at: string;
 };
+interface NavigatorLocalAIPlugin {
+  availability(): Promise<{ available: boolean; reason?: string; message?: string }>;
+  respond(options: { instructions: string; prompt: string }): Promise<{ text: string }>;
+}
+
+const NavigatorLocalAI = registerPlugin<NavigatorLocalAIPlugin>("NavigatorLocalAI");
+
 
 export default function ConversationPanel({ conversationId }: { conversationId: string }) {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
@@ -86,7 +94,7 @@ export default function ConversationPanel({ conversationId }: { conversationId: 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const clean = draft.trim();
-    if (!clean) return;
+    if (!clean || busy) return;
 
     setBusy(true);
     const token = await accessToken();
@@ -96,24 +104,69 @@ export default function ConversationPanel({ conversationId }: { conversationId: 
       return;
     }
 
-    const response = await fetch(`/api/conversations/${conversationId}/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ role: "user", content: clean })
-    });
-    const body = await response.json();
-    setBusy(false);
-    if (!response.ok) {
-      setStatus(body.error || "Could not send message.");
-      return;
-    }
-
     setDraft("");
-    setMessages((current) => [...current, body.message]);
-    setStatus("Saved.");
+    setStatus("Navigator is thinking…");
+
+    try {
+      const userResponse = await fetch(`/api/conversations/${conversationId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ content: clean })
+      });
+      const userBody = await userResponse.json();
+      if (!userResponse.ok) {
+        setDraft(clean);
+        setStatus(userBody.error || "Could not save message.");
+        return;
+      }
+
+      if (userBody.message) {
+        setMessages((current) => current.some((item) => item.id === userBody.message.id) ? current : [...current, userBody.message]);
+      }
+
+      const contextResponse = await fetch(`/api/conversations/${conversationId}/local-context`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+      });
+      const contextBody = await contextResponse.json();
+      if (!contextResponse.ok) {
+        setStatus(contextBody.error || "Navigator context is unavailable.");
+        return;
+      }
+
+      const availability = await NavigatorLocalAI.availability();
+      if (!availability.available) {
+        setStatus(availability.message || "Navigator local AI is not ready on this device.");
+        return;
+      }
+
+      const local = await NavigatorLocalAI.respond({ instructions: contextBody.instructions, prompt: contextBody.prompt });
+      if (!local.text?.trim()) {
+        setStatus("Navigator did not produce a response.");
+        return;
+      }
+
+      const saveResponse = await fetch(`/api/conversations/${conversationId}/local-result`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ content: local.text.trim() })
+      });
+      const saveBody = await saveResponse.json();
+      if (!saveResponse.ok) {
+        setStatus(saveBody.error || "Navigator could not save its response.");
+        return;
+      }
+
+      if (saveBody.assistant_message) {
+        setMessages((current) => current.some((item) => item.id === saveBody.assistant_message.id) ? current : [...current, saveBody.assistant_message]);
+      }
+      setStatus("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Local AI request failed.";
+      setStatus(message.includes("not implemented") ? "Navigator local AI is available in the iPhone app only." : `Navigator could not answer: ${message}`);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function saveTitle() {
