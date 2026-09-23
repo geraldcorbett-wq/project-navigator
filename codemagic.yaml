@@ -8,6 +8,8 @@ workflows:
       app_store_connect: Navigator App Store
 
     environment:
+      groups:
+        - navigator
       # Configure deployment values in the protected Codemagic environment.
       # No live service configuration is stored in this source package.
       node: 22
@@ -61,3 +63,4 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
+
